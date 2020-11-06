@@ -32,7 +32,7 @@ fi
 
 # Setup volume mounts for compose config and context
 if [ "$(pwd)" != '/' ]; then
-    VOLUMES="-v $(pwd):$(pwd)"
+    VOLUMES="-v $(pwd):$(pwd):Z"
 fi
 if [ -n "$COMPOSE_FILE" ]; then
     COMPOSE_OPTIONS="$COMPOSE_OPTIONS -e COMPOSE_FILE=$COMPOSE_FILE"
@@ -46,7 +46,7 @@ if [ -n "$COMPOSE_PROJECT_NAME" ]; then
 fi
 # TODO: also check --file argument
 if [ -n "$compose_dir" ]; then
-    VOLUMES="$VOLUMES -v $compose_dir:$compose_dir"
+    VOLUMES="$VOLUMES -v $compose_dir:$compose_dir:Z"
 fi
 if [ -n "$HOME" ]; then
     VOLUMES="$VOLUMES -v $HOME:$HOME -e HOME" # Pass in HOME to share docker.config and allow ~/-relative paths to work.
@@ -67,4 +67,4 @@ if docker info --format '{{json .SecurityOptions}}' 2>/dev/null | grep -q 'name=
 fi
 
 # shellcheck disable=SC2086
-exec docker run --rm $DOCKER_RUN_OPTIONS $DOCKER_ADDR $COMPOSE_OPTIONS $VOLUMES -w "$(pwd)" $IMAGE "$@"
+exec docker run --rm --privileged $DOCKER_RUN_OPTIONS $DOCKER_ADDR $COMPOSE_OPTIONS $VOLUMES -w "$(pwd)" $IMAGE "$@"
